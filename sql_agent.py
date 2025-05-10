@@ -1,18 +1,14 @@
 from dataclasses import dataclass
 import json
 from textwrap import dedent
-from dotenv import load_dotenv
-import os
-
-# Load environment variables
-load_dotenv()
+import streamlit as st  # Use Streamlit secrets instead of dotenv
 
 from httpx import AsyncClient
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.anthropic import AnthropicModel
 from pydantic_ai.providers.anthropic import AnthropicProvider
-from sqlalchemy import Engine, create_engine, inspect, text  # Import create_engine and text
+from sqlalchemy import Engine, create_engine, inspect, text
 from datetime import datetime
 from sqlalchemy.orm import Session
 
@@ -36,7 +32,7 @@ class ResponseModel(BaseModel):
 custom_http_client = AsyncClient(timeout=30)
 model = AnthropicModel(
     'claude-3-5-sonnet-latest',
-    provider=AnthropicProvider(api_key=os.getenv("API_KEY"), http_client=custom_http_client),
+    provider=AnthropicProvider(api_key=st.secrets["API_KEY"], http_client=custom_http_client),
 )
 
 agent = Agent(
@@ -100,7 +96,7 @@ def get_current_date(ctx: RunContext) -> str:
     return current_date
 
 if __name__ == "__main__":
-    db_engine = create_engine(os.getenv("DATABASE_URL"))  # Use environment variable
+    db_engine = create_engine(st.secrets["DATABASE_URL"])  # Use Streamlit secrets
     deps = Dependencies(db_engine=db_engine)
 
     response = agent.run_sync(

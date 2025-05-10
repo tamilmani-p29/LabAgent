@@ -1,14 +1,9 @@
 import streamlit as st
 from sqlalchemy import create_engine
 from sql_agent import agent, Dependencies
-from dotenv import load_dotenv
-import os
-
-# Load environment variables
-load_dotenv()
 
 # Initialize the database engine
-db_engine = create_engine(os.getenv("DATABASE_URL"))
+db_engine = create_engine(st.secrets["DATABASE_URL"])
 deps = Dependencies(db_engine=db_engine)
 
 # Streamlit app configuration
